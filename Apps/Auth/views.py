@@ -8,7 +8,8 @@ from django.contrib.auth.decorators import login_required
 
 def user_logout(request):
     logout(request)
-    return HttpResponseRedirect(reverse('home'))
+    return redirect('/')
+   # return HttpResponseRedirect(reverse('/'))
 
 
 def register(request):
@@ -27,6 +28,8 @@ def register(request):
             #     profile.profile_pic = request.FILES['profile_pic']
             profile.save()
             registered = True
+            login(request, user)
+            return redirect('/')
         else:
             print(user_form.errors,profile_form.errors)
     else:

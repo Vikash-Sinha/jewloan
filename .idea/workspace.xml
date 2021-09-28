@@ -2,7 +2,27 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="abcbbe69-43c0-4b78-a6e6-b7330a901144" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Apps/Loan/migrations/0018_auto_20210406_1332.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jewloan/settings/VikashSinha.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Apps/Auth/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Apps/Auth/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Apps/Auth/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/Apps/Auth/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Apps/Loan/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/Apps/Loan/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Apps/Loan/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/Apps/Loan/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Apps/Loan/templatetags/loan_amount_cal_tag.py" beforeDir="false" afterPath="$PROJECT_DIR$/Apps/Loan/templatetags/loan_amount_cal_tag.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Apps/Loan/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/Apps/Loan/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jewloan/settings/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/jewloan/settings/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/jewloan/settings/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/jewloan/settings/base.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/staticfiles/css/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/staticfiles/css/main.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/Auth/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Auth/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/Loan/add_new_loan.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Loan/add_new_loan.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/Loan/loan_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Loan/loan_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/Loan/report.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Loan/report.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/Loan/view_loan.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Loan/view_loan.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/home/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/home/home.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,5 +64,6 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
 </project>

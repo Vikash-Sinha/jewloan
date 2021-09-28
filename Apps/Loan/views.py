@@ -2,24 +2,46 @@ from django.shortcuts import render, redirect
 from django.views import View
 from .forms import *
 from django.http import JsonResponse
-import datetime
+# import datetime
+from datetime import *
+from django.db.models import Q
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+#   *** input date format yyyy-mm-dd
+def str_to_date(dates):
+    dates = dates.split('-')
+    year = dates[0]
+    month = dates[1]
+    dates = dates[2]
+    new_date = datetime(int(year),int(month),int(dates))
+    return new_date
 
 
 def riskUpdate(request,id):
+    # import pdb
+    # pdb.set_trace()
     wt = request.POST.get('wt')
     tr = request.POST.get('tr')
     tAmt = request.POST.get('today_approve_amount')
     pAmt = request.POST.get('past_approve_amount')
-    l = LoanDetail.objects.get(id=id)
+    loan_detail_obj = LoanDetail.objects.get(id=id)
+    today_value_till_date = 0
+    if loan_detail_obj.UpdateRate:
+        today_value_till_date = float(loan_detail_obj.LoanID.weight) * float(loan_detail_obj.UpdateRate)
+    ed1 = LoanInfo.objects.get(id=loan_detail_obj.LoanID)
+    # Grand Amount Calculation
+    si, grand = grandAmountCal(ed1)
     risk = ""
-    if float(tAmt) < float(pAmt):
-        l.IsonRisk = True
-        l.UpdateRate=tr
+    # if float(tAmt) < float(pAmt):
+    # if float(tAmt) < float(pAmt) or grand > today_value_till_date:
+    if grand > today_value_till_date and today_value_till_date is not 0:
+        loan_detail_obj.IsonRisk = True
+        loan_detail_obj.UpdateRate=tr
         risk = "In Risk Now"
     else:
-        l.IsonRisk = False
+        loan_detail_obj.IsonRisk = False
         risk = "Not In Risk"
-    l.save()
+    loan_detail_obj.save()
     data = {
         'tr': tr,
         'wt': wt,
@@ -33,7 +55,7 @@ def grandAmountCal(loan_info_obj):
     amt = loan_info_obj.loan_amount
     rt = loan_info_obj.rate_of_interest
     aprove_date = loan_info_obj.added_date.date()
-    today = datetime.date.today()
+    today = date.today()
     if loan_info_obj.exit_date:
         today = loan_info_obj.exit_date.date()
     day = today - aprove_date
@@ -69,16 +91,27 @@ class Serial(View):
  # Loan View Page
 def viewLoan(request,id):
     template_name = "Loan/view_loan.html"
-    currentDate = datetime.datetime.now()
+    currentDate = datetime.now()
     currentDate = currentDate.strftime("%x")
     ed = LoanDetail.objects.get(id=id)
     ed1 = LoanInfo.objects.get(id=ed.LoanID)
     notes = LoanDetail.objects.all().order_by('TodayDate').reverse()
+    paginator = Paginator(notes, 50)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     # Grand Amount Calculation
     amt=ed1.loan_amount
     si, grand = grandAmountCal(ed1)
-    return render(request, template_name,
-                  {'loanD': ed, 'loanI': ed1, 'loanA': amt, 'notes': notes, 'currentDate': currentDate,'total_interest':si,'grand':grand})
+    context= {
+        'loanD': ed,
+        'loanI': ed1,
+        'loanA': amt,
+        'notes': page_obj,
+        'currentDate': currentDate,
+        'total_interest': si,
+        'grand': grand
+    }
+    return render(request, template_name,context)
 
 
 def addNotes(request, id):
@@ -126,8 +159,9 @@ def delLoan(request, id):
 
 def exitLoan(request,id):
     ids = LoanDetail.objects.get(id=id)
+    time = datetime.now()
     loan_info=LoanInfo.objects.get(id=ids.LoanID)
-    loan_info.exit_date=datetime.datetime.now()
+    loan_info.exit_date = time
     loan_info.save()
 
     return redirect('/')
@@ -137,30 +171,57 @@ def exitLoan(request,id):
 class Report(View):
     template_name = "Loan/report.html"
 
-    def get(self,request):
-        loan_info = LoanInfo.objects.all()
-        to = request.GET.get('to')
-        froms = request.GET.get('froms')
-        if to and to !='':
-            loan_info = loan_info.filter(added_date__date__lte = to,loan__Active=True )
-        if froms and froms !='':
-            loan_info = loan_info.filter(added_date__date__gte=froms)
-
+    def amount_send(self,loan_info):
         amount_send = 0
         interest = 0
+        for i in loan_info:
+            if i.loan.filter(Active=True).exists():
+                si, grand = grandAmountCal(i)
+                interest += si
+                amount_send += i.loan_amount
+
+        return amount_send , interest
+
+    def amount_recive(self,loan_info):
         amount_receive = 0
-        profit = 0
-        loss = 0
         for i in loan_info:
             if i.loan.filter(Active=True).exists():
                 if i.exit_date:
                     si, grand = grandAmountCal(i)
                     amount_receive += grand
-                else:
-                    si, grand = grandAmountCal(i)
-                    interest += si
+        return amount_receive
 
-                amount_send += i.loan_amount
+    def get(self,request):
+        to_date = request.GET.get('to')
+        froms = request.GET.get('froms')
+        loan_info_recive = LoanInfo.objects.all()
+        loan_info_send = LoanInfo.objects.all()
+        if froms and froms !='':
+            from_date = str_to_date(froms)
+            from_date_time = datetime.strptime(str(from_date.date()) + ' 00:00:00', '%Y-%m-%d %H:%M:%S')
+            loan_info_send = loan_info_send.filter(added_date__date__gte=from_date_time)
+            loan_info_recive = loan_info_recive.filter(exit_date__date__gte=from_date_time)
+        if to_date and to_date !='':
+            to_dates = str_to_date(to_date)
+            to_date_time = datetime.strptime(str(to_dates.date()) + ' 23:59:59', '%Y-%m-%d %H:%M:%S')
+            loan_info_send = loan_info_send.filter(added_date__date__lte=to_date_time)
+            loan_info_recive = loan_info_recive.filter(exit_date__date__lte=to_date_time)
+
+
+        profit = 0
+        loss = 0
+        amount_receive = self.amount_recive(loan_info_recive)
+        amount_send ,interest = self.amount_send(loan_info_send)
+        # for i in loan_info:
+        #     if i.loan.filter(Active=True).exists():
+        #         if i.exit_date:
+        #             si, grand = grandAmountCal(i)
+        #             amount_receive += grand
+        #         else:
+        #             si, grand = grandAmountCal(i)
+        #             interest += si
+        #
+        #         amount_send += i.loan_amount
 
         amount_receive = round(amount_receive,3)
         amount_send = round(amount_send,3)
@@ -171,13 +232,14 @@ class Report(View):
         else:
             loss = amount_send-amount_receive
             loss = round(loss,3)
-
         context = {
             'amount_send':amount_send,
             'amount_receive':amount_receive,
             'profit':profit,
             'interest':interest,
-            'loss':loss
+            'loss':loss,
+            'froms':froms,
+            'to_date':to_date,
         }
 
         return render(request,self.template_name,context)
@@ -192,28 +254,40 @@ class LoanList(View):
         sn = SerialNo.objects.all()
         name=request.GET.get('name')
         sns=request.GET.get('sno')
+        Sname=request.GET.get('Sname')
         risk=request.GET.get('risk')
         to = request.GET.get('to')
         froms= request.GET.get('froms')
         frm = LoanDetail.objects.all().order_by('LoanID').reverse()
-        if name and name !='':
+        if name and name != '':
             frm = frm.filter(LoanID__name=name)
-        if sns and sns !='':
+        if sns and sns != '':
             frm = frm.filter(LoanID__sr_no__startswith=sns)
-        if risk and risk !='':
+        if Sname and Sname != '':
+            frm = frm.filter(LoanID__sr_no=Sname)
+        if risk and risk != '':
             frm = frm.filter(IsonRisk=risk)
-        if to and to !='':
+        if to and to != '':
             frm = frm.filter(LoanID__added_date__date__lte = to)
-        if froms and froms !='':
+        if froms and froms != '':
             frm = frm.filter(LoanID__added_date__date__gte=froms)
         item=PrrodcutMaster.objects.all()
+        # param = request.get_full_path()
+        # params = param.replace('/?', '')
+        paginator = Paginator(frm, 50)
+        page = request.GET.get('page')
+        try:
+            page_obj = paginator.page(page)
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
 
         # calculation of Total Loan In safe or In risk ---
         loan=LoanDetail.objects.filter(Active=True)
         total_loan=0
         loan_safe=0
         loan_risk=0
-
         for i in loan:
             if i.IsonRisk=='True':
                 loan_risk+=1
@@ -222,20 +296,30 @@ class LoanList(View):
 
         total_loan=loan_safe+loan_risk
         loan_total=[total_loan,loan_risk,loan_safe]
-        return render(request, self.template_name, {'loanF': frm,'items':item,'Sno':sn,'loan_total':loan_total})
+        return render(request, self.template_name, {'loanF': page_obj,'items':item,'Sno':sn,'loan_total':loan_total,
+                                                    'filter_serial_no':sns, 'filter_risk':risk,
+                                                    'name':name, 'sns':sns, 'risk': risk,'froms':froms,'to':to})
 
 
     def post(selfself,request):
         today_rate=request.POST.get('TodayRate')
         product=request.POST.get('product_Name')
         loan_detail=LoanDetail.objects.all()
+
         for i in loan_detail:
             try:
-                amount=i.LoanID.amount
-                present_amount=float(today_rate) * float(i.LoanID.weight)
-                product_type=str(i.LoanID.product_id)
-                i.UpdateRate=today_rate
-                if amount > present_amount and product_type==product:
+                # import pdb
+                # pdb.set_trace()
+                amount = i.LoanID.amount
+                today_value_til_date = 0
+                present_amount = float(today_rate) * float(i.LoanID.weight)
+                product_type = str(i.LoanID.product_id)
+                i.UpdateRate = today_rate
+                today_value_til_date = float(i.LoanID.weight) * float(i.UpdateRate)
+                ed1 = LoanInfo.objects.get(id=i.LoanID)
+                si, grand = grandAmountCal(ed1)
+                if grand > today_value_til_date and product_type == product and today_value_til_date != 0:
+                # if amount > present_amount and product_type==product:
                     i.IsonRisk=True
                     i.save()
                 elif product_type==product:
@@ -268,9 +352,14 @@ class AddLoan(View):
         sn = []
         for i in DSno:
             # i=str(i)
+            try:
+                num = int(i[len(fSn):])
+                if i[:len(fSn)] == fSn:
+                    sn.append(i)
+            except:
+                continue
 
-            if i[:len(fSn)] == fSn:
-                sn.append(i)
+
 
         if (len(sn) == 0):
             fSn = fSn + '0001'
@@ -296,22 +385,38 @@ class AddLoan(View):
         approve_per = request.POST.get('approve_per')
         itm = PrrodcutMaster.objects.get(name=pd_id)
         total_amount = float(total_weight) * float(total_rate)
-        approve_per =total_amount*float(approve_per)/100
-        approve_per=round(approve_per,3)
-        total_amount=round(total_amount,3)
+        act_loan_amt = total_amount*float(approve_per)/100
+        act_loan_amt=round(float(act_loan_amt),3)
+
+        approve_per = request.POST.get('loan')
+        approve_per = round(float(approve_per),3)
+
+        risk=False
+        if act_loan_amt<approve_per:
+            risk=True
+
+        total_amount = round(total_amount,3)
+
+        # Date code
+        dates = datetime.now()
+        if request.POST.get('dat'):
+            dates = request.POST.get('dat')
 
          # Interest per day Calculations
         int_rate = request.POST.get('rate_of_interest')
         interest_per_day = approve_per * float(int_rate)/(100*30)
         interest_per_day=round(interest_per_day,3)
+
         if form.is_valid() and forms.is_valid():
             add_product = form.save()
             add_p = forms.save()
             add_product.sr_no = fSn
             add_product.product_id = itm
+            add_product.added_date = dates
             add_product.interest_per_day = interest_per_day
             add_p.LoanID = add_product
             add_p.Active = True
+            add_p.IsonRisk = risk
             add_product.amount = total_amount
             add_product.loan_amount = approve_per
             add_product.save()

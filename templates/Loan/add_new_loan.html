@@ -44,32 +44,41 @@
                                     {% endfor %}
                                 </select>
                             </div>
+
                         </div>
 
 
                         <div class="form-row">
-
-                            <div class="form-group col-md-3">
+                            <div class="form-group col-md-4">
                                 <label for="Weight">Weight(in gram)</label>
                                 <input type="number" name="weight" step="any" class="form-control" required id="weight"
                                        onchange="myFunction()" placeholder="Enter Weight">
                             </div>
-                            <div class="form-group col-md-3">
+                             <div class="form-group col-md-4">
+                                <label for="dates">Approved Date</label>
+                                <input type="date" name="dat"  class="form-control">
+                            </div>
+
+                            <div class="form-group col-md-4">
                                 <label for="TodayRate">Today Rate</label>
                                 <input type="number" step="any" name="TodayRate" class="form-control" required
                                        id="TodayRate" onchange="myFunction()" placeholder="Enter Today Rates">
                             </div>
-                            <div class="form-group col-md-3">
+                            <div class="form-group col-md-4">
                                 <label for="approve_per">Approved Percentage</label>
                                 <input type="number" name="approve_per" step="any" class="form-control" required
                                        id="approve_per" onchange="myFunction()" placeholder="Enter Approved Percentage">
                             </div>
-                            <div class="form-group col-md-3">
+                            <div class="form-group col-md-4">
                                 <label for="rate_of_interest">Rate of Interest(Monthly)</label>
                                 <input type="number" step="any" name="rate_of_interest" class="form-control" required
                                        id="rate_of_interest" onchange="myFunction()"
                                        placeholder="Enter Rate of interest">
 
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="dates">Approved Loan</label>
+                                <input type="number" step="any" name="loan"  class="form-control" placeholder="Enter Approved Loan Amount">
                             </div>
                         </div>
                         <!-- Display javascript amount and  today rate -->

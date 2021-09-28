@@ -11,7 +11,7 @@
                 <div class="col-lg-12">
                     <div class="container-fluid" style="margin:0;padding:0">
                         <div class="row">
-                            <div class="col-lg-6 col-xl-6">
+                            <div class="col-lg-6 col-xl-4">
                                 <a class="card mb- widget-content bg-midnight-bloom" style="text-decoration: none;">
                                     <div class="widget-content-wrapper text-white">
                                         <div class="widget-content-left">
@@ -23,7 +23,7 @@
                                     </div>
                                 </a>
                             </div>
-                            <div class="col-lg-6 col-xl-6">
+                              <div class="col-lg-4 col-xl-4">
                                 <a class="card mb-3 widget-content bg-midnight-bloom" style="text-decoration: none;">
                                     <div class="widget-content-wrapper text-white">
                                         <div class="widget-content-left">
@@ -31,6 +31,19 @@
                                         </div>
                                         <div class="widget-content-right">
                                             <div class="widget-numbers text-white"><span>{{loanI.name}}</span></div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+
+                             <div class="col-lg-4 col-xl-4">
+                                 <a class="card mb-3 widget-content bg-midnight-bloom" style="text-decoration: none;">
+                                    <div class="widget-content-wrapper text-white">
+                                        <div class="widget-content-left">
+                                            <div class="widget-subheading">Weight:</div>
+                                        </div>
+                                        <div class="widget-content-right">
+                                            <div class="widget-numbers text-white"><span>{{loanI.weight}}</span></div>
                                         </div>
                                     </div>
                                 </a>
@@ -53,10 +66,12 @@
                                 <a class="card mb-3 widget-content bg-midnight-bloom" style="text-decoration: none;">
                                     <div class="widget-content-wrapper text-white">
                                         <div class="widget-content-left">
-                                            <div class="widget-subheading">Amount:</div>
+<!--                                            <div class="widget-subheading">Amount:</div>-->
+                                            <div class="widget-subheading">Approved Loan:</div>
                                         </div>
                                         <div class="widget-content-right">
-                                            <div class="widget-numbers text-white"><span>{{loanI.amount}}</span></div>
+<!--                                            <div class="widget-numbers text-white"><span>{{loanI.amount}}</span></div>-->
+                                            <div class="widget-numbers text-white"><span>{{loanI.loan_amount}}</span></div>
                                         </div>
                                     </div>
                                 </a>
@@ -124,10 +139,10 @@
                                  <a class="card mb-3 widget-content bg-midnight-bloom" style="text-decoration: none;">
                                     <div class="widget-content-wrapper text-white">
                                         <div class="widget-content-left">
-                                            <div class="widget-subheading">Weight:</div>
+                                            <div class="widget-subheading">No of Days:</div>
                                         </div>
                                         <div class="widget-content-right">
-                                            <div class="widget-numbers text-white"><span>{{loanI.weight}}</span></div>
+                                            <div class="widget-numbers text-white"><span>{{loanI|No_of_day}}</span></div>
                                         </div>
                                     </div>
                                 </a>
@@ -195,8 +210,11 @@
                         <div class="row">
 
                             <div class="col-lg-3 text-center">
-                                <a href="#" class="mr-2 btn-transition btn btn-outline-light">Total Amount:
-                                    {{loanI.amount}}</a>
+<!--                                <a href="#" class="mr-2 btn-transition btn btn-outline-light">Total Amount:-->
+<!--                                    {{loanI.amount}}</a>-->
+                                <a href="#" class="mr-2 btn-transition btn btn-outline-light">Today Value Till Date:
+                                    {% todayAmount loanD.LoanID.weight loanD.UpdateRate %}
+                                </a>
                             </div>
                             <div class="col-lg-3 text-center">
                                 <a href="#" class="mr-2 btn-transition btn btn-outline-light">Approved Loan:
@@ -274,6 +292,25 @@
                     </div>
                 </div>
                 {% endfor %}
+
+                 <!--FOR PAGINATION-->
+                        <div class="pagination" style="float:right;">
+                            <span class="step-links">
+                                {% if notes.has_previous %}
+                                    <a href="?page=1">&laquo; First</a>
+                                    <a href="?page={{ notes.previous_page_number }}">Previous</a>
+                                {% endif %}
+
+                                <span class="current">
+                                    Page {{ notes.number }} of {{ notes.paginator.num_pages }}.
+                                </span>
+
+                                {% if notes.has_next %}
+                                    <a href="?page={{ notes.next_page_number }}">Next</a>
+                                    <a href="?page={{ notes.paginator.num_pages }}">Last &raquo;</a>
+                                {% endif %}
+                            </span>
+                        </div>
 
 
                 <form method="POST" action="{% url 'Notes_add' loanD.id %}" enctype="multipart/form-data">
@@ -373,15 +410,15 @@
                 </button>
             </div>
             <div class="modal-body" id="GFG">
-               <h1 style="text-align:center;"><img src='{% static "images/sm-logo.png"  %}' style="width: 60%;"></h1>
-                <h3>Sr_No: <span>{{loanI.sr_no}}</span></h3>
-                 <h3>Name: <span>{{loanI.name}}</span></h3>
-                <h3>Product: <span>{{loanI.product_id.name}}</span></h3>
-                <h3>Weight: <span>{{loanI.weight}}</span></h3>
+               <h4 style="">SM</h4>
+                <p>Sr_No: {{loanI.sr_no}}</p>
+                 <p>Name: {{loanI.name}}</p>
+                <p>Product: {{loanI.product_id.name}}</p>
+                <p>Weight: {{loanI.weight}}</p>
 
-                 <h3>Date: <span>{{loanI.added_date| date:'d M y'}}</span></h3>
-                 <h3>Loan Amount: <span>{{loanI.loan_amount}}</span></h3>
-                 <h3>Comments: <span>{{loanD.Notes}}</span></h3>
+                 <p>Date: {{loanI.added_date| date:'d M y'}}</p>
+                 <p>Loan Amount: {{loanI.loan_amount}}</p>
+                 <p>Comments: {{loanD.Notes}}</p>
 
                 <iframe name="print_frame" width="0" height="0" frameborder="0" src="about:blank"></iframe>
             </div>
