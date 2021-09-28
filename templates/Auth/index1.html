@@ -1,0 +1,14 @@
+{% extends "Auth/base.html" %}
+{% block body_block %}
+<div class="container">
+  <div class="jumbotron">
+    <h1>Welcome!</h1>
+    {% if user.is_authenticated %}
+      <h1>You are logged in</h1>
+        <h2>Hello {{ user.first_name }} {{ user.last_name }}</h2>
+    {% else %}
+        <h2>Register or Login</h2>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

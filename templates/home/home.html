@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load loan_amount_cal_tag %}
+{% block content %}
+<style>
+    .modal-backdrop.show{
+    opacity:0 !important;
+    }
+    .modal.show .modal-dialog {
+    transform: none;
+    margin-top: 80px;
+
+}
+.bg-midnight-bloom {
+    background-image: linear-gradient(
+-20deg
+, #b30707 0%, #b30707 100%) !important;
+}
+.modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000;
+}
+
+
+</style>
+
+<div class="app-main__outer">
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Calculate Risk</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                            onclick="$('.modal').removeClass('show').addClass('fade');">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <form method="POST" action="" enctype="multipart/form-data"> {% csrf_token %}
+
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="product_Name">Product Name</label>
+                                <select id="product_Name" name="product_Name" class="form-control">
+                                    <option value="" disabled selected>Select</option>
+                                    {% for data in items %}
+                                    <option value="{{data.name}}">{{data.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="TodayRate">Today Rate</label>
+                                <input type="text" name="TodayRate" class="form-control" required id="TodayRate"
+                                       onchange="myFunction()" placeholder="Enter Today Rates">
+                            </div>
+
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-main__inner">
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="col-lg-12 page-title-heading">
+                    <div class="container-fluid" style="margin:0;padding:0">
+                        <div class="row">
+                            <div class="col-lg-3 col-xl-3">
+                                <a class="card mb-3 widget-content bg-arielle-smile" href="#"
+                                   style="text-decoration: none;">
+                                    <div class="widget-content-wrapper text-white">
+                                        <div class="widget-content-left">
+                                            <div class="widget-subheading">Total Loan:</div>
+                                            <!--                            <div class="widget-subheading">Warranty Registerted</div>-->
+                                        </div>
+                                        <div class="widget-content-right">
+                                            <div class="widget-numbers text-white"><span> {{loan_total.0}}</span></div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-3 col-xl-3">
+                                <a class="card mb-3 widget-content bg-midnight-bloom" href="#"
+                                   style="text-decoration: none;">
+                                    <div class="widget-content-wrapper text-white">
+                                        <div class="widget-content-left">
+                                            <div class="widget-subheading">In Risk:</div>
+                                            <!--                            <div class="widget-subheading">Total Feeedback</div>-->
+                                        </div>
+                                        <div class="widget-content-right">
+                                            <div class="widget-numbers text-white"><span>{{loan_total.1}}</span></div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <div class="col-lg-2 col-xl-2">
+                                <a class="card mb-3 widget-content bg-grow-early" href="#"
+                                   style="text-decoration: none;">
+                                    <div class="widget-content-wrapper text-white">
+                                        <div class="widget-content-left">
+                                            <!-- <div class="widget-heading">Customers</div> -->
+                                            <div class="widget-subheading">In Safe:</div>
+                                            <!--                            <div class="widget-subheading">Total Support</div>-->
+                                        </div>
+                                        <div class="widget-content-right">
+                                            <div class="widget-numbers text-white"><span>{{loan_total.2}}</span></div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-xl-2">
+                                <a href="{% url 'add_loan' %}" class="card mb-3 widget-content"  style="color: #fff;background-color: #3f6ad8; border-color: #3f6ad8;text-decoration:none;">Add New Loan</a>
+                            </div>
+                            <!-- Model Code here -->
+                            <!-- Button trigger modal -->
+                            <div class="col-lg-2 col-xl-2">
+                                <a class="card mb-3 widget-content" data-toggle="modal" data-target="#exampleModal"
+                                   style="color: #fff;background-color: #3f6ad8; border-color: #3f6ad8;">
+                                    Calculate Risk
+                                </a>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+<!-- Filter form -->
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <form method="GET" enctype="multipart/form-data"> {% csrf_token %}
+            <div class="main-card mb-3 card col-lg-12">
+                <div class="card-body">
+                    <h4 style="text-align:center;font-weight:600">Filter Table</h4>
+                    <div class="form-row">
+
+        <!-- Close Filter Form -->
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="main-card mb-3 card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="mb-0 table table-hover table-striped">
+                                <thead>
+                                <tr style="text-align:center;">
+                                    <th>Sr.No</th>
+                                    <th>Name</th>
+                                    <th>Product</th>
+                                    <th>Weight</th>
+                                    <th>Rate Of Interest</th>
+                                    <th>Interest Per Day</th>
+                                    <th>Amount</th>
+                                    <th>Approved Loan</th>
+                                    <th>Approved Date</th>
+                                    <th>Exit Date</th>
+                                    <th>View</th>
+
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for mdl in loanF %}
+                                {% if mdl.IsonRisk == 'True' %}
+                                <tr style="text-align:center; border:solid; border-color: red; ">
+                                    {% else %}
+                                <tr style="text-align:center;">
+
+                                    {% endif %}
+                                    {% if mdl.LoanID.sr_no != null and mdl.Active %}
+                                    <td>{{mdl.LoanID.sr_no}}</td>
+                                    <td>{{mdl.LoanID.name}}</td>
+                                    <td>{{mdl.LoanID.product_id}}</td>
+                                    <td>{{mdl.LoanID.weight}}</td>
+                                    <td>{{mdl.LoanID.rate_of_interest}}</td>
+                                    <td>{{mdl.LoanID.interest_per_day }}</td>
+
+                                    <td>{{mdl.LoanID.amount}}</td>
+                                    <td>{{ mdl.LoanID.loan_amount }}</td>
+                                    <td>{{mdl.LoanID.added_date | date:"d M, Y"}}</td>
+
+                                    {% if mdl.LoanID.exit_date %}
+                                        <td>{{mdl.LoanID.exit_date | date:"d M, Y"}}</td>
+                                    {% else %}
+                                        <td>Active</td>
+                                    {% endif %}
+
+                                    <td><a href="{% url 'view' mdl.id %}">
+                                        <button type="button" class="btn btn-primary">View</button>
+                                    </a></td>
+
+                                    {% endif %}
+                                </tr>
+=======
+                        <div class="form-group col-lg-2 col-xl-2">
+                            <label for="SNo">SNo.</label>
+                            <select id="SNo" name="sno" class="form-control">
+                                <option value="" disabled selected>Select</option>
+                                {% for data in Sno %}
+                                <option value="{{data}}">{{data}}</option>
+>>>>>>> 78f17c1ab81e54b72a5a2c29a85ca8a9623582b3
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-3 col-xl-3">
+                            <label for="name">Name.</label>
+                            <input type="text" name="name" class="form-control" id="name" placeholder="Enter Name">
+                        </div>
+                        <div class="form-group col-lg-2 col-xl-2">
+                            <label for="risk">Risk</label>
+                            <select id="risk" name="risk" class="form-control">
+                                <option value="">Select</option>
+
+                                <option value="True">In Risk</option>
+                                <option value="False">Not In Risk</option>
+
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-2 col-xl-2">
+                            <label for="froms">From</label>
+                            <input name="froms" id="froms" type="date" class="datepicker form-control">
+                        </div>
+                        <div class="form-group col-lg-2 col-xl-2">
+                            <label for="to">To</label>
+                            <input name="to" id="to" type="date" class="datepicker form-control">
+                        </div>
+                        <div class="form-group col-lg-1 col-xl-1" style="margin-top:35px;">
+                            <button type="submit" class="btn btn-secondary">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+<!-- Close Filter Form -->
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="main-card mb-3 card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="mb-0 table table-hover table-striped">
+                        <thead>
+                        <tr style="text-align:center;">
+                            <th>Sr.No</th>
+                            <th>Name</th>
+                            <th>Product</th>
+                            <th>Weight</th>
+                            <th>Rate Of Interest</th>
+                            <th>Interest Per Day</th>
+                            <th>Amount</th>
+                            <th>Approved Loan</th>
+                            <th>Approved Date</th>
+                            <th>Exit Date</th>
+                            <th>View</th>
+
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for mdl in loanF %}
+                        {% if mdl.IsonRisk == 'True' %}
+                        <tr style="text-align:center; border:solid; border-color: red; ">
+                            {% else %}
+                        <tr style="text-align:center;">
+
+                            {% endif %}
+                            {% if mdl.LoanID.sr_no != null and mdl.Active %}
+                            <td>{{mdl.LoanID.sr_no}}</td>
+                            <td>{{mdl.LoanID.name}}</td>
+                            <td>{{mdl.LoanID.product_id}}</td>
+                            <td>{{mdl.LoanID.weight}}</td>
+                            <td>{{mdl.LoanID.rate_of_interest}}</td>
+                            <td>{{mdl.LoanID.interest_per_day }}</td>
+                            <td>{{mdl.LoanID.amount}}</td>
+                            <td>{{ mdl.LoanID.loan_amount }}</td>
+                            <td>{{mdl.LoanID.added_date | date:"d M, Y"}}</td>
+
+                            {% if mdl.LoanID.exit_date %}
+                            <td>{{mdl.LoanID.exit_date | date:"d M, Y"}}</td>
+                            {% else %}
+                            <td>Active</td>
+                            {% endif %}
+
+                            <td><a href="{% url 'view' mdl.id %}">
+                                <button type="button" class="btn btn-primary">View</button>
+                            </a></td>
+
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

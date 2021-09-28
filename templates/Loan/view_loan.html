@@ -1,0 +1,399 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{% load loan_amount_cal_tag %}
+
+
+<div class="app-main__outer">
+    <div class="app-main__inner">
+        <div class="app-page-title" style="padding-bottom:0px">
+            <div class="page-title-wrapper">
+                <div class="col-lg-12">
+                    <div class="container-fluid" style="margin:0;padding:0">
+                        <div class="row">
+                            <div class="col-lg-6 col-xl-6">
+                                <a class="card mb- widget-content bg-midnight-bloom" style="text-decoration: none;">
+                                    <div class="widget-content-wrapper text-white">
+                                        <div class="widget-content-left">
+                                            <div class="widget-subheading">Sr_No:</div>
+                                        </div>
+                                        <div class="widget-content-right">
+                                            <div class="widget-numbers text-white"><span>{{loanI.sr_no}}</span></div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-6 col-xl-6">
+                                <a class="card mb-3 widget-content bg-midnight-bloom" style="text-decoration: none;">
+                                    <div class="widget-content-wrapper text-white">
+                                        <div class="widget-content-left">
+                                            <div class="widget-subheading">Name:</div>
+                                        </div>
+                                        <div class="widget-content-right">
+                                            <div class="widget-numbers text-white"><span>{{loanI.name}}</span></div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <div class="col-lg-4 col-xl-4">
+                                <a class="card mb-3 widget-content bg-midnight-bloom" style="text-decoration: none;">
+                                    <div class="widget-content-wrapper text-white">
+                                        <div class="widget-content-left">
+                                            <div class="widget-subheading">Product Name:</div>
+                                        </div>
+                                        <div class="widget-content-right">
+                                            <div class="widget-numbers text-white">
+                                                <span>{{loanI.product_id.name}}</span></div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-4 col-xl-4">
+                                <a class="card mb-3 widget-content bg-midnight-bloom" style="text-decoration: none;">
+                                    <div class="widget-content-wrapper text-white">
+                                        <div class="widget-content-left">
+                                            <div class="widget-subheading">Amount:</div>
+                                        </div>
+                                        <div class="widget-content-right">
+                                            <div class="widget-numbers text-white"><span>{{loanI.amount}}</span></div>
+                                        </div>
+                                    </div>
+                                </a>
+
+
+                            </div>
+                            <div class="col-lg-4 col-xl-4">
+                                <a class="card mb-3 widget-content bg-midnight-bloom" style="text-decoration: none;">
+                                    <div class="widget-content-wrapper text-white">
+                                        <div class="widget-content-left">
+                                            <div class="widget-subheading">Rate of Interest:</div>
+                                        </div>
+                                        <div class="widget-content-right">
+                                            <div class="widget-numbers text-white">
+                                                <span>{{loanI.rate_of_interest}}</span></div>
+
+                                        </div>
+
+                                    </div>
+
+                                </a>
+
+                            </div>
+                            <div class="col-lg-4 col-xl-4">
+                                <a class="card mb-3 widget-content bg-midnight-bloom" style="text-decoration: none;">
+                                    <div class="widget-content-wrapper text-white">
+                                        <div class="widget-content-left">
+                                            <div class="widget-subheading">Approved Date:</div>
+                                        </div>
+                                        <div class="widget-content-right">
+                                            <div class="widget-numbers text-white">
+                                                <span>{{loanI.added_date | date:"d M Y"}}</span></div>
+                                        </div>
+                                    </div>
+                                </a>
+                                {% if not loanD.LoanID.exit_date %}
+                                 <td><a style="font-size:25px; padding:1s0px;" href="{% url 'exit_ac' loanD.id %}" class="btn btn-primary">
+                                            Exit Account
+                                    </a></td>
+                                {% endif %}
+                            </div>
+                            <div class="col-lg-4 col-xl-4">
+                                <a class="card mb-3 widget-content bg-midnight-bloom" style="text-decoration: none;">
+                                    <div class="widget-content-wrapper text-white">
+                                        <div class="widget-content-left">
+                                            <div class="widget-subheading">Interest Par Day:</div>
+                                        </div>
+                                        <div class="widget-content-right">
+                                            <div class="widget-numbers text-white">
+                                                <span>{{loanI.interest_per_day}}</span></div>
+                                        </div>
+                                    </div>
+                                </a>
+
+                                <!-- slip download model code -->
+
+
+
+
+                              <button type="button" style="font-size:25px" class="btn mr-2 mb-2 btn-primary" data-toggle="modal"  data-target="#exampleModalLong">
+                                            Show Receipts
+                                        </button>
+                            </div>
+                            <div class="col-lg-4 col-xl-4">
+                                 <a class="card mb-3 widget-content bg-midnight-bloom" style="text-decoration: none;">
+                                    <div class="widget-content-wrapper text-white">
+                                        <div class="widget-content-left">
+                                            <div class="widget-subheading">Weight:</div>
+                                        </div>
+                                        <div class="widget-content-right">
+                                            <div class="widget-numbers text-white"><span>{{loanI.weight}}</span></div>
+                                        </div>
+                                    </div>
+                                </a>
+
+                                <td><a style="font-size:25px" href="{% url 'del' loanD.id %}" class="btn btn-danger">
+                                            Delete
+                                    </a></td>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--                                <div class="page-title-heading">-->
+                <!--&lt;!&ndash;                                    <div class="page-title-icon">&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        <i class="pe-7s-car icon-gradient bg-mean-fruit">&ndash;&gt;-->
+                <!--&lt;!&ndash;                                        </i>&ndash;&gt;-->
+                <!--&lt;!&ndash;                                    </div>&ndash;&gt;-->
+                <!--                                    <div class="row">-->
+                <!--                                        <div class="page-title-subheading col-md-2">-->
+                <!--                                            <label>Sr_No:</label>-->
+                <!--                                            <span>{{loanI.sr_no}}</span>-->
+                <!--                                        </div>-->
+                <!--                                        <div class="page-title-subheading col-md-2">-->
+                <!--                                            <label>Name:</label>-->
+                <!--                                            <span>{{loanI.name}}</span>-->
+                <!--                                        </div>-->
+                <!--                                        <div class="page-title-subheading col-md-2">-->
+                <!--                                           <label>Product Name:</label>-->
+                <!--                                           <span>{{loanI.product_id.name}}</span>-->
+                <!--                                        </div>-->
+                <!--                                         <div class="page-title-subheading col-md-2">-->
+                <!--                                           <label>Weigth:</label>-->
+                <!--                                           <span>{{loanI.weight}}</span>-->
+
+                <!--                                        </div>-->
+                <!--                                        <div class="page-title-subheading col-md-2">-->
+                <!--                                           <label>Today rate:</label>-->
+                <!--                                           <span>{{loanD.TodayRate}}</span>-->
+                <!--                                        </div>-->
+                <!--                                        <div class="page-title-subheading col-md-2">-->
+                <!--                                            <label>Rate of Interest:</label>-->
+                <!--                                            <span>{{loanI.rate_of_interest}}</span>-->
+                <!--                                        </div>-->
+                <!--                                        <div class="page-title-subheading col-md-2">-->
+                <!--                                            <label>Interest Par Day:</label>-->
+                <!--                                            <span>{{loanI.interest_per_day}}</span>-->
+                <!--                                        </div>-->
+                <!--                                        <div class="page-title-subheading col-md-2">-->
+                <!--                                            <label>Amount:</label>-->
+                <!--                                            <span>{{loanI.amount}}</span>-->
+                <!--                                        </div>-->
+
+                <!--                                        &lt;!&ndash; <div class="page-title-subheading">View details of products</div> &ndash;&gt;-->
+                <!--                                    </div>-->
+
+                <!--                                </div>-->
+
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="main-card mb-3 card">
+                    <div class="card-body">
+                        <div class="row">
+
+                            <div class="col-lg-3 text-center">
+                                <a href="#" class="mr-2 btn-transition btn btn-outline-light">Total Amount:
+                                    {{loanI.amount}}</a>
+                            </div>
+                            <div class="col-lg-3 text-center">
+                                <a href="#" class="mr-2 btn-transition btn btn-outline-light">Approved Loan:
+                                    {{loanI.loan_amount}}</a>
+                            </div>
+                            <div class="col-lg-3 text-center">
+                                <a href="#" class="mr-2 btn-transition btn btn-outline-light">Total Interest: {{total_interest}}</a>
+                            </div>
+                            <div class="col-lg-3 text-center">
+                                <a href="#" class="mr-2 btn-transition btn btn-outline-light">Grand Total: {{grand}}</a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <form method="POST" enctype="multipart/form-data"> {% csrf_token %}
+                    <div class="main-card mb-3 card col-md-12">
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label for="TodayRate">Today Rate.</label>
+                                    <input type="number" name="TodayRate" class="form-control" id="TodayRate" required
+                                           placeholder="Enter Today Rate">
+                                </div>
+                                <div class="form-group col-md-1 mt-2">
+                                    <h6 style="margin-top:30px;">Date:{{currentDate}}</h6>
+
+                                </div>
+                                <div class="form-group col-md-7" style="margin-top:30px;">
+                                    <button type="button" onclick="calRisk()" id="cal-risk" class="btn btn-primary">
+                                        Calculate Risk
+                                    </button>
+
+                                </div>
+                                <div class="form-group">
+                                    <h6 id="past_risk"></h6>
+                                    <h6 id="today_risk"></h6>
+                                    <h4 id="risk"></h4>
+                                    {% if loanD.IsonRisk == 'True' %}
+                                    <h6 id="hide1">Weight:{{loanD.LoanID.weight}}Gram, Approved Amount:
+                                        {{loanD.LoanID.amount}}</h6>
+
+                                    <h6 id="hide2">Risk Rate:{{loanD.UpdateRate}} Risk Amount:{% todayAmount loanD.LoanID.weight loanD.UpdateRate %}</h6>
+                                    <h4 id="hide3"> In Risk Now</h4>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+
+        <div class="row">
+            <p style="font-size:1.2rem;font-weight:600;margin-left:15px">Comments</p>
+            <div class="col-lg-12">
+                {% for i in notes %}
+                <div class="main-card mb-3 card">
+                    <div class="card-body">
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div><p style="white-space:pre-wrap;font-size:15px;">{{i.Notes}}</p>  <h6> At {{i.TodayDate}}</h6></div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+                {% endfor %}
+
+
+                <form method="POST" action="{% url 'Notes_add' loanD.id %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="Notes" style="font-size:1.2rem;font-weight:600">Add Notes</label>
+                        <textarea name="Notes" class="form-control" id="Notes" required rows="5"
+                                  placeholder="Add New Notes"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+
+
+                </form>
+            </div>
+
+
+        </div>
+
+
+    </div>
+</div>
+
+{% endblock %}
+{% block javascript %}
+
+<script>
+
+
+ function printDiv() {
+            var divContents = document.getElementById("GFG").innerHTML;
+           window.frames["print_frame"].document.body.innerHTML = divContents;
+         window.frames["print_frame"].window.focus();
+         window.frames["print_frame"].window.print();
+
+        }
+
+
+
+
+
+
+
+    function calRisk(){
+
+        tr=parseInt(document.getElementById("TodayRate").value)
+        amt={{loanI.amount}};
+        approved_rate={{loanD.TodayRate}};
+        wt={{loanI.weight}};
+        past_approve_amount=amt*0.75;
+        today_amount=wt*tr;
+        today_approve_amount=wt*tr*0.75;
+        pst="Weight:"+wt+"Gram, Approved Amount: "+past_approve_amount;
+        tdy="Today rate:"+tr+" Amount to be Approved: "+today_approve_amount;
+
+        data = {
+              'tr':tr,
+              'today_approve_amount':today_approve_amount,
+              'past_approve_amount' : past_approve_amount,
+              'wt':wt,
+
+              'csrfmiddlewaretoken':$("input[name=csrfmiddlewaretoken]").val()
+
+         };
+          $.ajax({
+            url: '{% url "update_is_on_risk" loanD.id %}',
+            type: "POST",
+            data:data ,
+
+            success: function (data)
+            {
+
+                pst="Weight:"+data.wt+"Gram, Approved Amount: "+data.pAmt;
+                tdy="Today rate:"+data.tr+" Amount to be Approved: "+data.tAmt;
+                document.getElementById("past_risk").innerHTML= pst;
+                document.getElementById("today_risk").innerHTML= tdy;
+                document.getElementById("risk").innerHTML= data.risk;
+                document.getElementById("hide1").innerHTML= "";
+                document.getElementById("hide2").innerHTML= "";
+                document.getElementById("hide3").innerHTML= "";
+
+            }
+          });
+
+
+    }
+
+</script>
+
+<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body" id="GFG">
+               <h1 style="text-align:center;"><img src='{% static "images/sm-logo.png"  %}' style="width: 60%;"></h1>
+                <h3>Sr_No: <span>{{loanI.sr_no}}</span></h3>
+                 <h3>Name: <span>{{loanI.name}}</span></h3>
+                <h3>Product: <span>{{loanI.product_id.name}}</span></h3>
+                <h3>Weight: <span>{{loanI.weight}}</span></h3>
+
+                 <h3>Date: <span>{{loanI.added_date| date:'d M y'}}</span></h3>
+                 <h3>Loan Amount: <span>{{loanI.loan_amount}}</span></h3>
+                 <h3>Comments: <span>{{loanD.Notes}}</span></h3>
+
+                <iframe name="print_frame" width="0" height="0" frameborder="0" src="about:blank"></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="btnPrint" type="button"  onclick="printDiv()" class="btn btn-primary">Print Receipts</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+{% endblock %}

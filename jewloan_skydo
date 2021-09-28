@@ -1,0 +1,113 @@
+#!groovy
+
+
+def proj_name = "jenkins_jewloan_skydo"
+def slack_channel="project-jewloan"
+def script_file_name="jewloan_skydo.py"
+def site_url="jewloan.do.viewyoursite.net"
+
+ def slackMsg(emoji, buildmsg,m1,m2,m3,m4,m5 ) {
+    def msg =   ":${emoji}: *${buildmsg}*: `${env.JOB_NAME}#${env.BUILD_NUMBER}`\n\n"+
+                "*${m1}*: `${m2}`\n"+
+                "_${m3}:_\n"+
+                "```${m4}```\n"+
+                "*Site URL*: `http://${m5}`\n"+
+                "<${env.BUILD_URL}|Open in Jenkins>"
+    return msg;
+}
+
+def sendMail(details) {
+    emailext (
+      subject: "JENKINS - ${JOB_NAME} (${BUILD_NUMBER}) FAILED!",
+      body: details,
+      recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider'],[$class: 'CulpritsRecipientProvider']]
+    )
+}
+
+
+node {
+
+    try {
+        def sh_SuccessMsg=""
+        def lastChanges=""
+
+        stage('Checkout'){
+            print "************ In Stage Checkout"
+            updateGitlabCommitStatus name: 'Checkout', state: 'pending'
+            checkout scm
+            sh "git log HEAD^..HEAD --pretty='%h %an - %s' > ${proj_name}_GIT_CHANGES"
+            lastChanges = readFile("${proj_name}_GIT_CHANGES")
+            updateGitlabCommitStatus name: 'Checkout', state: 'success'
+        }
+
+        stage('************* Deploy'){
+            print "In Stage Deploy"
+           updateGitlabCommitStatus name: 'Deploy', state: 'pending'
+
+           /* NOTE: in cse of $ in script use \ char */
+
+            def logfile = "/var/lib/jenkins/skylogs/${proj_name}_${env.BUILD_NUMBER}_sh_output.log"
+            def sh_script
+            sh_script = "cd /var/lib/jenkins/git_deploy/fab"
+            //sh_script += " && . ../fab_env/bin/activate"
+            sh_script += " && ../fab_env/bin/python ${script_file_name}"
+            sh_script += " > ${logfile} 2>&1"
+            def status = sh(returnStatus: true, script: sh_script)
+
+            def output = readFile(logfile).trim()
+            print output
+            def echo_status = output.split('\n')
+            sh_SuccessMsg=""
+
+            if (status != 0) {
+                def sh_ErrorMsg = echo_status.findAll { it.contains('ERROR:-') }.join('\n')
+
+                errorLines = echo_status.findAll { it.contains('error') || it.contains('Error') || it.contains('ERROR') }.join('\n')
+                errorLines = errorLines + '\n'+ echo_status.findAll { it.contains('exception') || it.contains('Exception') || it.contains('Exception') }.join('\n')
+
+                //output[-1500..-1]
+                def errmsg = slackMsg('x','Build Failed','REASON',sh_ErrorMsg,'Error Log',errorLines, site_url)
+                slackSend channel: slack_channel, color: "danger", message: errmsg
+                currentBuild.result = 'ABORTED'
+                sendMail(output)
+                updateGitlabCommitStatus name: 'Deploy', state: 'failed'
+                error('-STOP-')
+
+
+            }
+            else
+            {
+                 sh_SuccessMsg = echo_status.findAll { it.contains('DONE:-') }.join('\n')
+                 updateGitlabCommitStatus name: 'Deploy', state: 'success'
+
+            }
+            sh "rm ${logfile}"
+
+        }
+         stage('Publish results'){
+            if(currentBuild.result != 'ABORTED')
+            {
+                def msg =slackMsg('trophy','Build Sucessful','SH Response',sh_SuccessMsg,'Git Commits', lastChanges, site_url)
+                slackSend channel: slack_channel, color: "good", message: msg
+                updateGitlabCommitStatus name: 'Pubish Results', state: 'success'
+
+            }
+         }
+
+    }
+
+    catch (err) {
+
+        def exp_error = err.toString()
+        if (!exp_error.contains('-STOP-'))
+        {
+            updateGitlabCommitStatus name: 'Deploy', state: 'failed'
+            def errmsg = slackMsg('x','Build Failed','REASON','Unexpected Error','Exception',exp_error, site_url)
+            slackSend channel: slack_channel, color: "danger", message: errmsg
+        }
+        throw err
+    }
+}
+
+
+
